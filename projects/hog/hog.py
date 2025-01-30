@@ -16,13 +16,27 @@ def roll_dice(num_rolls, dice=six_sided):
 
     num_rolls:  The number of dice rolls that will be made.
     dice:       A function that simulates a single dice roll outcome.
+    
+    根据num_rolls的次数，统计dice给出的结果，如果有一次为1则结果是1.
+    规则1:播种伤心。如果任何骰子结果为 1，则当前玩家在该回合的分数为 1。
+    默认规则
     """
     # These assert statements ensure that num_rolls is a positive integer.
     assert type(num_rolls) == int, 'num_rolls must be an integer.'
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
-    # END PROBLEM 1
+    sum=0
+    hasOne=0;
+    k=0
+    while k<num_rolls:  
+        dice_res=dice()  
+        if dice_res==1:
+            hasOne=1
+        sum+=dice_res
+        k+=1
+    return sum if hasOne==0 else 1
+    
 
 
 def boar_brawl(player_score, opponent_score):
@@ -30,12 +44,28 @@ def boar_brawl(player_score, opponent_score):
 
     player_score:     The total score of the current player.
     opponent_score:   The total score of the other player.
-
+    规则2: 野猪斗殴，abs(我方分数个位-对方分数中位) * 3 如果结果为0，则是1
+    这个规则为【掷出零骰子的玩家】加分
     """
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
     # END PROBLEM 2
+    if player_score==0 and opponent_score==0:
+        return 1
+    # 获取对手分中位
+    o=tens_digit(opponent_score)
+    # 获取自己分数的个位
+    p=player_score%10
+    r=abs(o-p)*3
+    if r==0:
+        return 1
+    else:
+        return r
 
+def tens_digit(opponent_score):
+    if opponent_score<10:
+        return 0
+    return opponent_score%100//10
 
 def take_turn(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the points scored on a turn rolling NUM_ROLLS dice when the
@@ -53,11 +83,16 @@ def take_turn(num_rolls, player_score, opponent_score, dice=six_sided):
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
     # END PROBLEM 3
+    if num_rolls == 0:
+        return boar_brawl(player_score, opponent_score)
+    else:
+        return roll_dice(num_rolls, dice)
 
 
 def simple_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the total score of a player who starts their turn with
     PLAYER_SCORE and then rolls NUM_ROLLS DICE, ignoring Sus Fuss.
+    计算分数1:使用了【规则1】和【规则2】
     """
     score = player_score + take_turn(num_rolls, player_score, opponent_score, dice)
     return score
@@ -76,23 +111,42 @@ def is_prime(n):
 def num_factors(n):
     """Return the number of factors of N, including 1 and N itself."""
     # BEGIN PROBLEM 4
+    sum=0
+    b=n
+    while b>0:
+        if n%b==0:
+            sum+=1
+        b-=1
+    return sum
     "*** YOUR CODE HERE ***"
     # END PROBLEM 4
 
 def sus_points(score):
     """Return the new score of a player taking into account the Sus Fuss rule."""
     # BEGIN PROBLEM 4
+    num=num_factors(score)
+    if num==3 or num==4:
+        # 是sus，找到下一个素数
+        score+=1
+        while is_prime(score) == False:
+            score+=1
+        return score
+    else:
+        return score
     "*** YOUR CODE HERE ***"
     # END PROBLEM 4
 
 def sus_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the total score of a player who starts their turn with
     PLAYER_SCORE and then rolls NUM_ROLLS DICE, *including* Sus Fuss.
+    计算分数2: 苏斯·福斯，一个数字能分解3，4个因子，则获取当前分数下一个素数。
+    这个规则为【掷出骰子的玩家】加分
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    score=simple_update(num_rolls, player_score, opponent_score, dice)
     # END PROBLEM 4
-
+    return sus_points(score)
 
 def always_roll_5(score, opponent_score):
     """A strategy of always rolling 5 dice, regardless of the player's score or
@@ -129,7 +183,16 @@ def play(strategy0, strategy1, update,
     """
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    "*** YOUR CODE HERE ***"  
+    while score0 < goal and score1 < goal:
+        if who == 0:
+            num_rolls = strategy0(score0, score1)
+            score0 = update(num_rolls, score0, score1, dice)
+        else:
+            num_rolls = strategy1(score1, score0)
+            score1 = update(num_rolls, score1, score0, dice)
+        who = 1 - who
+
     # END PROBLEM 5
     return score0, score1
 
@@ -156,6 +219,9 @@ def always_roll(n):
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
     # END PROBLEM 6
+    def strategy(score0,score1):   
+        return n
+    return strategy
 
 
 def catch_up(score, opponent_score):
@@ -172,7 +238,7 @@ def catch_up(score, opponent_score):
     else:
         return 5
 
-
+# todo:没有理解这个函数的中文说明
 def is_always_roll(strategy, goal=GOAL):
     """Return whether STRATEGY always chooses the same number of dice to roll
     given a game that goes to GOAL points.
@@ -187,12 +253,19 @@ def is_always_roll(strategy, goal=GOAL):
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
     # END PROBLEM 7
+    old = strategy(0, 0)
+    for i in range(goal):
+        for j in range(goal):
+            if old != strategy(i, j):
+                return False
+            old = strategy(i, j)
+    return True
 
 
 def make_averaged(original_function, samples_count=1000):
     """Return a function that returns the average value of ORIGINAL_FUNCTION
     called SAMPLES_COUNT times.
-
+    #返回调用samples_count次后的original_function
     To implement this function, you will have to use *args syntax.
 
     >>> dice = make_test_dice(4, 2, 5, 1)
@@ -202,6 +275,14 @@ def make_averaged(original_function, samples_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def ave_func(*args):
+        k=0
+        sum=0
+        while k<samples_count:
+            sum+=original_function(*args)
+            k+=1
+        return sum/samples_count
+    return ave_func
     # END PROBLEM 8
 
 
@@ -216,6 +297,14 @@ def max_scoring_num_rolls(dice=six_sided, samples_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max_score = 0
+    max_num_rolls = 0
+    for i in range(1,11):
+        average_score = make_averaged(roll_dice, samples_count)(i, dice)
+        if average_score > max_score:
+            max_score = average_score
+            max_num_rolls = i
+    return max_num_rolls
     # END PROBLEM 9
 
 
@@ -260,14 +349,27 @@ def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
     points, and returns NUM_ROLLS otherwise. Ignore score and Sus Fuss.
     """
     # BEGIN PROBLEM 10
-    return num_rolls  # Remove this line once implemented.
+    score_boar = boar_brawl(score, opponent_score)
+    if(score_boar >= threshold):
+        return 0
+    else:
+        return num_rolls  # Remove this line once implemented.
     # END PROBLEM 10
 
 
 def sus_strategy(score, opponent_score, threshold=11, num_rolls=6):
     """This strategy returns 0 dice when your score would increase by at least threshold."""
     # BEGIN PROBLEM 11
-    return num_rolls  # Remove this line once implemented.
+    score_boar = boar_brawl(score, opponent_score)
+    # print("DEBUG:",score_boar)
+    score_sus = sus_points(score + score_boar)
+    # print("DEBUG:",score_sus)
+    diff = score_sus - score
+    # print("DEBUG:",diff)
+    if(diff >= threshold):
+        return 0
+    else:
+        return num_rolls  # Remove this line once implemented.
     # END PROBLEM 11
 
 
@@ -276,8 +378,10 @@ def final_strategy(score, opponent_score):
 
     *** YOUR DESCRIPTION HERE ***
     """
-    # BEGIN PROBLEM 12
-    return 6  # Remove this line once implemented.
+    if(score > 80 and score - opponent_score > 20):
+        return 0
+    else:
+        return 6  # Remove this line once implemented.
     # END PROBLEM 12
 
 
