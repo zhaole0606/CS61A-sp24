@@ -128,6 +128,5 @@ def make_onion(f, g):
             return True
         else:
             return can_reach(f(x), y, limit - 1) or can_reach(g(x), y, limit - 1)
-
     return can_reach
 
