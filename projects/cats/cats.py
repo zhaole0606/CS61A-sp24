@@ -32,6 +32,10 @@ def pick(paragraphs, select, k):
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
     # END PROBLEM 1
+    l=[x for x in paragraphs if select(x) ]
+    if len(l)> k: 
+        return l[k]
+    return ''
 
 
 def about(subject):
@@ -51,6 +55,14 @@ def about(subject):
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
     # END PROBLEM 2
+    def check(input):
+        new_line=split(lower(remove_punctuation(input)))
+        for x in subject:
+          if x in new_line:
+              return True
+        return False
+    return check
+
 
 
 def accuracy(typed, source):
@@ -80,6 +92,20 @@ def accuracy(typed, source):
     source_words = split(source)
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if typed_words== [] and source_words==[]:
+        return 100.0
+    elif typed_words== [] or source_words==[]:
+        return 0.0
+
+def cal(typed_words,source_words):
+    if typed_words==[] or source_words==[]:
+        return 0
+    tw=typed_words[0]
+    sw=source_words[0]
+    if tw==sw:
+
+    cal(typed_words[1:],source_words[1:])
+    
     # END PROBLEM 3
 
 
