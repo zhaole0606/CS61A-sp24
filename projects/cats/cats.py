@@ -90,22 +90,26 @@ def accuracy(typed, source):
     """
     typed_words = split(typed)
     source_words = split(source)
+   
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
-    if typed_words== [] and source_words==[]:
+    if len(typed_words)==0 and len(source_words)==0 :
+        return 100.0  
+    if len(typed_words)==0:
+        return 0.0  
+    n = cal(typed_words, source_words)
+    if n == len(typed_words):
         return 100.0
-    elif typed_words== [] or source_words==[]:
-        return 0.0
+    return n/len(typed_words) * 100
 
-def cal(typed_words,source_words):
-    if typed_words==[] or source_words==[]:
+def cal(typed_words, source_words):
+    if len(typed_words) == 0 or len(source_words) == 0:
         return 0
-    tw=typed_words[0]
-    sw=source_words[0]
-    if tw==sw:
-
-    cal(typed_words[1:],source_words[1:])
-    
+    tw = typed_words[0]
+    sw = source_words[0]
+    if tw != sw:
+        return cal(typed_words[1:], source_words[1:])
+    return 1 + cal(typed_words[1:], source_words[1:])
     # END PROBLEM 3
 
 
@@ -125,7 +129,8 @@ def wpm(typed, elapsed):
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
     # END PROBLEM 4
-
+    rate=60/elapsed
+    return len(typed)/5*rate
 
 ############
 # Phase 2A #
@@ -154,7 +159,20 @@ def autocorrect(typed_word, word_list, diff_function, limit):
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
     # END PROBLEM 5
-
+    min_limit = limit+ 1
+    key_word = typed_word
+    
+    for word in word_list:
+        if word == typed_word:
+            return word
+        
+        diff = diff_function(typed_word, word, limit)
+        
+        if min_limit > abs(diff):
+            min_limit = abs(diff)
+            key_word = word
+    
+    return typed_word if min_limit > limit else key_word
 
 def feline_fixes(typed, source, limit):
     """A diff function for autocorrect that determines how many letters
@@ -179,10 +197,17 @@ def feline_fixes(typed, source, limit):
     5
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
     # END PROBLEM 6
-
-
+    def select(a, b, sum):
+        if sum > limit:
+            return 0
+        elif not a or not b:
+            return abs(len(a) - len(b))
+        if a[0] == b[0]:
+            return select(a[1:], b[1:], sum)
+        else:
+            return select(a[1:], b[1:], sum + 1) + 1
+    return select(typed, source, 0)
 ############
 # Phase 2B #
 ############
