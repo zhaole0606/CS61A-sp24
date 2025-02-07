@@ -212,7 +212,7 @@ def feline_fixes(typed, source, limit):
 # Phase 2B #
 ############
 
-
+## 此题是ChatGPT给出的答案
 def minimum_mewtations(typed, source, limit):
     """A diff function that computes the edit distance from TYPED to SOURCE.
     This function takes in a string TYPED, a string SOURCE, and a number LIMIT.
@@ -228,29 +228,34 @@ def minimum_mewtations(typed, source, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________: # Base cases should go here, you may add more base cases as needed.
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    # Recursive cases should go below here
-    if ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    else:
-        add = ... # Fill in these lines
-        remove = ...
-        substitute = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    if len(typed) == 0:
+        return len(source)
 
+    # Base case 2: If source is empty, all characters of typed must be deleted
+    if len(source) == 0:
+        return len(typed)
+
+    # If the difference between typed and source exceeds the limit, return limit
+    if limit < 0:
+        return 0
+
+    # If the last characters match, no operation is needed
+    if typed[-1] == source[-1]:
+        return minimum_mewtations(typed[:-1], source[:-1], limit)
+
+    # Otherwise, we consider three cases: add, remove, or substitute
+    add = minimum_mewtations(typed, source[:-1], limit - 1)  # Insert a character
+    remove = minimum_mewtations(typed[:-1], source, limit - 1)  # Remove a character
+    substitute = minimum_mewtations(typed[:-1], source[:-1], limit - 1)  # Substitute a character
+
+    # Return the minimum number of operations required for any of the three actions
+    return min(add, remove, substitute) + 1
 
 def final_diff(typed, source, limit):
     """A diff function that takes in a string TYPED, a string SOURCE, and a number LIMIT.
     If you implement this function, it will be used."""
-    assert False, 'Remove this line to use your final_diff function.'
+    # assert False, 'Remove this line to use your final_diff function.'
+    return True
 
 FINAL_DIFF_LIMIT = 6 # REPLACE THIS WITH YOUR LIMIT
 
@@ -286,8 +291,17 @@ def report_progress(typed, source, user_id, upload):
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
     # END PROBLEM 8
+    correct_sum=0
+    for i  in range(0,len(typed)):
+        if typed[i]==source[i]:
+            correct_sum+=1
+        else:
+            break
 
-
+    rate = correct_sum/len(source)
+    upload({'id': user_id, 'progress': rate})
+    return rate
+    
 def time_per_word(words, timestamps_per_player):
     """Given timing data, return a match data abstraction, which contains a
     list of words and the amount of time each player took to type each word.
