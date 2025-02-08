@@ -322,7 +322,15 @@ def time_per_word(words, timestamps_per_player):
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
     # END PROBLEM 9
+    list_x=len(timestamps_per_player)
+    list_y=len(timestamps_per_player[0])
+    #构建二维数组
+    tmp = [[0] * (list_y-1) for _ in range(0, list_x)]
 
+    for idx in range(0,list_x):
+        for idy in range(0,list_y-1):
+            tmp[idx][idy]=timestamps_per_player[idx][idy+1]-timestamps_per_player[idx][idy]
+    return match(words,tmp)
 
 def fastest_words(match):
     """Return a list of lists of which words each player typed fastest.
@@ -344,7 +352,31 @@ def fastest_words(match):
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
     # END PROBLEM 10
+    player_indices = range(len(get_all_times(match)))  # contains an *index* for each player
+    word_indices = range(len(get_all_words(match)))    # contains an *index* for each word
+    # BEGIN PROBLEM 10
+    "*** YOUR CODE HERE ***"
+    # END PROBLEM 10
 
+    #找到最小时间的那个序列
+    all_words = get_all_words(match)
+    all_times = get_all_times(match)
+
+    #找到最小时间的那个序列 
+    tmp = [[] for _ in player_indices]
+
+    for w in word_indices:
+        # 循环人0,1,3
+        min_time = all_times[0][w]
+        min_time_idx=0
+        for p in player_indices:
+            p_t = all_times[p][w]
+            if min_time>p_t:
+                min_time=p_t
+                min_time_idx=p
+        #循环一列之后，找到最小的player下标
+        tmp[min_time_idx].append(all_words[w])
+    return tmp
 
 def match(words, times):
     """A data abstraction containing all words typed and their times.
