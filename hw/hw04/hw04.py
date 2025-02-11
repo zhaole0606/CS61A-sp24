@@ -83,13 +83,14 @@ def planet(mass):
     """Construct a planet of some mass."""
     assert mass > 0
     "*** YOUR CODE HERE ***"
+    return ['planet', mass]
 
 
 def mass(p):
     """Select the mass of a planet."""
     assert is_planet(p), 'must call mass on a planet'
     "*** YOUR CODE HERE ***"
-
+    return p[1]
 
 def is_planet(p):
     """Whether p is a planet."""
@@ -145,6 +146,12 @@ def balanced(m):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_planet(m):
+        return True
+    else:
+        left_mass =  total_mass(end(left(m))) * length(left(m))
+        right_mass = total_mass(end(right(m))) * length(right(m))
+        return left_mass == right_mass and balanced(end(left(m))) and balanced(end(right(m)))
 
 
 HW_SOURCE_FILE = __file__
@@ -159,8 +166,15 @@ def max_path_sum(t):
     >>> max_path_sum(t2) # 5, 2, 10
     17
     """
-    "*** YOUR CODE HERE ***"
+    "*** YOUR CODE HERE ***" 
+    if is_leaf(t):
+        return label(t)
+    max_sum = 0
+    for b in branches(t):
+        max_sum = max(max_path_sum(b), max_sum)
+    return label(t) + max_sum
 
+        
 
 # Tree Data Abstraction
 
