@@ -287,7 +287,7 @@ class ChangeMachine:
     """
     def __init__(self, pennies):
         self.coins = {1: pennies}
-
+    
     def change(self, coin):
         """Return change for coin, removing the result from self.coins."""
         "*** YOUR CODE HERE ***"
